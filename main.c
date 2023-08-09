@@ -35,6 +35,14 @@ void printMemory() {
     printf("\n");
 }
 
+void printMemoryToFile(FILE *outputFile) {
+    fprintf(outputFile, "Memory after operation: ");
+    for (int i = 0; i < MEMORY_SIZE; i++) {
+        fprintf(outputFile, "%d ", memory[i]);
+    }
+    fprintf(outputFile, "\n");
+}
+
 int main() {
     char input[50];
     int count;
@@ -49,9 +57,25 @@ int main() {
         } else {
             printf("Invalid command\n");
         }
-        
-        printf("Memory after operation: ");
-        printMemory();
+
+        // Captura da saída em um arquivo temporário
+        FILE *outputFile = fopen("memory_output.tmp", "w");
+        if (outputFile != NULL) {
+            printMemoryToFile(outputFile); //Printa o mapa de bits no terminal
+            fclose(outputFile);
+
+            // Execução do código para exibir a saída em um segundo terminal
+            #ifdef _WIN32
+            system("start cmd.exe /K type memory_output.tmp");
+            #elif __linux__
+            system("xterm -e cat memory_output.tmp");
+            #endif
+        } else {
+            printf("Error creating output file.\n");
+        }
+
+        // Limpa o buffer de entrada
+        while (getchar() != '\n');
     }
 
     return 0;
